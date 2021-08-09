@@ -12,8 +12,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     
-    <!-- TODO: Link Javascript file -->
-    <script src=""></script>
+    <!-- TODO: Link Javascript file  (inline script)-->
 
     
     <title>SCFHS Library</title>
@@ -27,9 +26,149 @@
             </a>
             </div>
         </nav>
-
+	
+	<main>
         <!-- TODO: Create a form to add books -->
+	
+	<h1> Add Book Form </h1>
+	<form class="form-horizontal" id= "formElem">
+	<div class="container">
+		<div class="form-group">
+			<label class="control-label col-sm-3" for="title">The title of the book:</label>
+			<input type="text" name="title" class="form-control" id="title" placeholder="book title">
+		</div>
+		
+		<div class="form-group">
+			<label  class="control-label col-sm-3" for="subtitle">The subtitle of the book:</label>
+			<input type="text" name="subtitle" class="form-control" id="subtitle" placeholder="book subtitle">
+		</div>
 
-        <!-- TODO: Create a list to view books -->
+		<div class="form-group">
+			<label class="control-label col-sm-3" for="author">The author name:</label>
+			<input type="text" name="author" class="form-control" id="author" placeholder="book author">
+		</div>
+		
+		<div class="form-group">
+			<label class="control-label col-sm-3" for="image">The image url:</label>
+			<input type="text" name="image" class="form-control" id="image" placeholder="url">
+		</div>
+		<button type="submit" class="btn btn-primary my-3" onClick="DisplayAddMSG()">Add Book</button> 
+	</div>	
+
+	</form>
+	
+	<!-- // TODO: Create a function to add books -->
+
+	<script>
+
+	
+	
+	function DisplayAddMSG(){
+	
+	const thisForm = document.getElementById('formElem');
+	thisForm.addEventListener('submit', async function (e) {
+		e.preventDefault();
+		const formData = new FormData(thisForm).entries()
+		const response = await fetch('https://61067a051f3487001743792a.mockapi.io/api/v1/Books', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(Object.fromEntries(formData))
+		});
+
+		const result = await response.json();
+		console.log(result)
+	});
+	MSG();
+	}
+	
+	function MSG(){
+	alert("Book Has Been Added, Refresh the page to view it in the list");
+	//	if(alert('Book Has Been Added')){}
+	//	else    window.location.href = "index.html";	
+	}
+	</script>
+	
+	<!-- TODO: Create a list to view books -->
+	
+	<h1> View Book List </h1>
+	<div class="container">
+
+        <!-- Here a loader is created which 
+             loads till response comes -->
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border" 
+                 role="status" id="loading">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+		
+	<ul class="list-group" id="BookList">	</ul>
+	</div>
+	
+        <!-- table for showing data -->
+        <table id="BookList"></table>
+
+	<script>
+	const api_url = "https://61067a051f3487001743792a.mockapi.io/api/v1/Books";
+	  
+	// Defining async function
+	async function getapi(url) {
+		// Storing response
+		const response = await fetch(url);
+		
+		// Storing data in form of JSON
+		var data = await response.json();
+		console.log(data);
+		if (response) {
+			hideloader();
+		}
+		show(data);
+	}
+	// Calling that async function
+	getapi(api_url);
+	  
+	// Function to hide the loader
+	function hideloader() {
+		document.getElementById('loading').style.display = 'none';
+	}
+	// Function to define innerHTML for HTML table
+	function show(data) {
+		let tab = 
+			"<li class='list-group-item'>"
+		
+		
+		// Loop to access all rows 
+		for (let r of  Object.entries(data)) {
+			var x = r[1].id
+			tab += ' Book title: '+ r[1].title +'<br> Subtitle: '+ r[1].subtitle +'<br> Auther: ' + r[1].author+'<br> Image URL: <a href= " ' +r.image+' "> Visit Link </a> <br> id: '+x+' <button class="btn btn-primary my-3" id="'+x+'" onclick="updateRecord(this)"> Delete Book </button> </li></ul> ';
+			
+						
+		}
+		//Setting innerHTML as tab variable 
+		document.getElementById("BookList").innerHTML = tab;
+	}
+	
+	function updateRecord(button) {
+	  // statements
+	  var id = button.id; // or however you want to use the id
+
+		fetch('https://61067a051f3487001743792a.mockapi.io/api/v1/Books/'+id+'',{
+            method:"DELETE"
+        })
+        .then(response => response.json())
+        .then(data => console.log(data))
+		
+		//alert("Book Has Been Deleted");
+		if(alert('Book Has Been Deleted')){}
+		else    window.location.reload(); 
+	}
+
+
+	
+	</script>
+	
+	
+	</main>
+
 </body>
 </html>
